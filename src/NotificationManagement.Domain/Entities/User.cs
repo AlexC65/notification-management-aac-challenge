@@ -1,4 +1,4 @@
-﻿namespace NotificationManagement.Domain;
+﻿namespace NotificationManagement.Domain.Entities;
 
 public class User
 {
