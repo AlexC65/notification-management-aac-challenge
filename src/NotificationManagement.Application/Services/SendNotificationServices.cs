@@ -5,9 +5,14 @@ namespace NotificationManagement.Application.Services
 {
     public class SendNotificationServices
     {
-        private readonly ISendNotification _sendNotification;
+        private  ISendNotification _sendNotification;
 
         public SendNotificationServices(ISendNotification sendNotification)
+        {
+            _sendNotification = sendNotification;
+        }
+
+        public void setSendNotification(ISendNotification sendNotification)
         {
             _sendNotification = sendNotification;
         }
