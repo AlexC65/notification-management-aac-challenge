@@ -2,6 +2,7 @@ using Moq;
 using NotificationManagement.Application.Services;
 using NotificationManagement.Domain.Entities;
 using NotificationManagement.Application.Interfaces;
+using NotificationManagement.Domain.Enums;
 
 namespace Application.UnitTests.Services
 {

@@ -3,24 +3,24 @@
 public class User
 {
     public Guid Id { get; private set; }
-    public string UserMail { get; set; }
-    public string UserName { get; set; }
-    public string UserPassword { get; set; }
+    public string Email { get; set; }
+    public string Name { get; set; }
+    public string PasswordHash { get; set; }
     public DateTime RegistrationDate { get; set; }
 
-    public User(string userMail, string userName, string userPassword)
+    public User(string email, string name, string passwordHash)
     {
-        if (string.IsNullOrEmpty(userMail))
-            throw new ArgumentException("User mail cannot be null or empty.", nameof(userMail));
-        if (string.IsNullOrEmpty(userName))
-            throw new ArgumentException("User name cannot be null or empty.", nameof(userName));
-        if (string.IsNullOrEmpty(userPassword))
-            throw new ArgumentException("User password cannot be null or empty.", nameof(userPassword));
+        if (string.IsNullOrEmpty(email))
+            throw new ArgumentException("User email cannot be null or empty.", nameof(email));
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("User name cannot be null or empty.", nameof(name));
+        if (string.IsNullOrEmpty(passwordHash))
+            throw new ArgumentException("User password cannot be null or empty.", nameof(passwordHash));
 
         Id = Guid.NewGuid();
-        UserMail = userMail;
-        UserName = userName;
-        UserPassword = userPassword;
+        Email = email;
+        Name = name;
+        PasswordHash = passwordHash;
         RegistrationDate = DateTime.UtcNow;
     }
 }

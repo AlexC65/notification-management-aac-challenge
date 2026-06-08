@@ -1,4 +1,5 @@
 using NotificationManagement.Domain.Entities;
+using NotificationManagement.Domain.Enums;
 
 namespace Application.UnitTests.Domain
 {

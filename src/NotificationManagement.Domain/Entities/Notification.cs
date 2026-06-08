@@ -1,3 +1,5 @@
+using NotificationManagement.Domain.Enums;
+
 namespace NotificationManagement.Domain.Entities;
 
 public class Notification

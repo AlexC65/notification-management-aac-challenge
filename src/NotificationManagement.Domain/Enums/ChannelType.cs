@@ -1,4 +1,4 @@
-namespace NotificationManagement.Domain.Entities;
+namespace NotificationManagement.Domain.Enums;
 
 public enum ChannelType
 {
