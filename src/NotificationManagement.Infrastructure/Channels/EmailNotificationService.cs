@@ -1,7 +1,7 @@
 ﻿using NotificationManagement.Application.Interfaces;
 using NotificationManagement.Domain.Entities;
 
-namespace NotificationManagement.Infrastructure;
+namespace NotificationManagement.Infrastructure.Channels;
 
 public class EmailNotificationService : ISendNotification
 {

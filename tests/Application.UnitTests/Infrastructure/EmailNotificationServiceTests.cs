@@ -1,4 +1,4 @@
-using NotificationManagement.Infrastructure;
+using NotificationManagement.Infrastructure.Channels;
 
 namespace Application.UnitTests.Infrastructure
 {

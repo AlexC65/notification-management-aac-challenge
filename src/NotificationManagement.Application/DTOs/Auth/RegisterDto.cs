@@ -1,9 +1,10 @@
-namespace NotificationManagement.Application.DTOs.Auth
-{
-    public sealed class RegisterDto
-    {
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
-}
+
+namespace NotificationManagement.Application.DTOs.Auth;
+
+public sealed record RegisterDto(
+    string UserName,
+    string Email,
+    string Password
+);
+
+
