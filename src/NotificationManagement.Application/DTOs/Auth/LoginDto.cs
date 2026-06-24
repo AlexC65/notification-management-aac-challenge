@@ -1,8 +1,7 @@
-namespace NotificationManagement.Application.DTOs.Auth
-{
-    public class LoginDto
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
-}
+namespace NotificationManagement.Application.DTOs.Auth;
+
+public sealed record LoginDto(
+    string Email,
+    string Password
+);
+

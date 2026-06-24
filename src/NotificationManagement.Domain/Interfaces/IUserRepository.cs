@@ -7,7 +7,7 @@ namespace NotificationManagement.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User?> GetByEmailAsync(string email);
-        Task AddAsync(User user);
+        Task<User?> GetByEmailAsync(string emai, CancellationToken ct = default);
+        Task AddAsync(User user, CancellationToken ct = default);
     }
 }

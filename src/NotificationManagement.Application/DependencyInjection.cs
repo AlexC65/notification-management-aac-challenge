@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NotificationManagement.Application.Services;
+using NotificationManagement.Application.Interfaces;
 
 namespace NotificationManagement.Application
 {
@@ -18,11 +19,11 @@ namespace NotificationManagement.Application
         /// <returns>
         /// The updated <see cref="IServiceCollection"/> instance.
         /// </returns>
-        public static IServiceCollection AddApplication(IServiceCollection services)
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             // Register application services, handlers, validators, etc.
             // e.g. services.AddScoped<IEmailSender, EmailSender>();
-            services.AddScoped<UserService>();
+            services.AddScoped<IUserService, UserService>();
 
             return services;
         }

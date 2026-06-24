@@ -1,7 +1,12 @@
-﻿namespace NotificationManagement.Domain.Entities;
+﻿using System.Text.RegularExpressions;
+using NotificationManagement.Domain.Exceptions;
 
+namespace NotificationManagement.Domain.Entities;
 public class User
 {
+    private static readonly Regex EmailRegex = new(
+        @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public Guid Id { get; private set; }
     public string Email { get; private set; }
     public string Name { get; private set; }
@@ -10,15 +15,17 @@ public class User
 
     public User(string email, string name, string passwordHash)
     {
-        if (string.IsNullOrEmpty(email))
-            throw new ArgumentException("User email cannot be null or empty.", nameof(email));
+        // if (string.IsNullOrEmpty(email))
+        //     throw new ArgumentException("User email cannot be null or empty.", nameof(email));
+        if (string.IsNullOrWhiteSpace(email) || !EmailRegex.IsMatch(email))
+            throw new InvalidEmailException(email);
         if (string.IsNullOrEmpty(name))
             throw new ArgumentException("User name cannot be null or empty.", nameof(name));
         if (string.IsNullOrEmpty(passwordHash))
             throw new ArgumentException("User password cannot be null or empty.", nameof(passwordHash));
 
         Id = Guid.NewGuid();
-        Email = email;
+        Email = email.ToLowerInvariant();;
         Name = name;
         PasswordHash = passwordHash;
         RegistrationDate = DateTime.UtcNow;

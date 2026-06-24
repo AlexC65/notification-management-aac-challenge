@@ -17,9 +17,9 @@ namespace NotificationManagement.Application.Services
             _userRepository = userRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
-        public async Task<string> LoginAsync(LoginDto dto)
+        public async Task<string> LoginAsync(LoginDto dto, CancellationToken ct = default)
         {
-            var user = await _userRepository.GetByEmailAsync(dto.Email);
+            var user = await _userRepository.GetByEmailAsync(dto.Email, ct);
             if (user == null)
             {
                 throw new UserNotFoundException(dto.Email);
@@ -33,9 +33,9 @@ namespace NotificationManagement.Application.Services
             return _jwtTokenGenerator.GenerateToken(user);
         }
 
-        public async Task RegisterAsync(RegisterDto dto)
+        public async Task<string> RegisterAsync(RegisterDto dto, CancellationToken ct = default)
         {
-            var existingUser = _userRepository.GetByEmailAsync(dto.Email);
+            var existingUser = await _userRepository.GetByEmailAsync(dto.Email, ct);
             if (existingUser != null)
                 throw new UserAlreadyExistsException(dto.Email);
             
@@ -43,8 +43,9 @@ namespace NotificationManagement.Application.Services
 
             var user = new User(dto.Email, dto.UserName, passwordHash);            
 
-            await _userRepository.AddAsync(user);
-            
+            await _userRepository.AddAsync(user);            
+
+            return _jwtTokenGenerator.GenerateToken(user);
         }
     }
 }

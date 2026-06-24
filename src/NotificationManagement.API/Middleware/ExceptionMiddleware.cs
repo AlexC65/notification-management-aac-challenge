@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using NotificationManagement.Domain.Exceptions;
+
 
 namespace NotificationManagement.API.Middleware;
 
@@ -12,14 +14,19 @@ public sealed class ExceptionMiddleware
     {
         _next = next;
         _logger = logger;
-
     }
 
-    public async Task InvokeAync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
             await _next(context);
+        }
+        catch (DomainException ex)
+        {
+            // Expected — warn only
+            _logger.LogWarning(ex, "Domain exception: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex);
         }
         catch (Exception ex)
         {
@@ -33,10 +40,19 @@ public sealed class ExceptionMiddleware
     {
         var (statusCode, message) = ex switch
         {
-            KeyNotFoundException => (HttpStatusCode.NotFound, ex.Message),
-            UnauthorizedAccessException => (HttpStatusCode.Forbidden, ex.Message),
-            InvalidOperationException => (HttpStatusCode.Conflict, ex.Message),
-            _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
+            //Domain exceptions
+            InvalidPasswordException => (HttpStatusCode.Unauthorized, ex.Message),        // 401
+            UserNotFoundException => (HttpStatusCode.NotFound, ex.Message),        // 404
+            InvalidEmailException     => (HttpStatusCode.BadRequest,   ex.Message),  // 400
+            DomainException => (HttpStatusCode.BadRequest, ex.Message),        // 400
+
+            //Built-in exceptions
+            KeyNotFoundException => (HttpStatusCode.NotFound, ex.Message),        // 404
+            UnauthorizedAccessException => (HttpStatusCode.Forbidden, ex.Message),        // 403
+            InvalidOperationException => (HttpStatusCode.Conflict, ex.Message),        // 409
+
+            //Catch-all
+            _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")    // 500
         };
 
         context.Response.ContentType = "application/json";
@@ -45,5 +61,4 @@ public sealed class ExceptionMiddleware
         var body = JsonSerializer.Serialize(new { error = message });
         return context.Response.WriteAsync(body);
     }
-
 }

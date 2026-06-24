@@ -14,17 +14,17 @@ namespace NotificationManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(User user, CancellationToken ct = default)
         {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _context.Users.AddAsync(user, ct);
+            await _context.SaveChangesAsync(ct);
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default)
         {
             return await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email == email, ct);
         }
     }
 }
