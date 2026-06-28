@@ -20,7 +20,7 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
-        var dto = new RegisterDto(request.Name, request.Email, request.Password);
+        var dto = new Application.DTOs.Auth.RegisterRequest(request.Name, request.Email, request.Password);
         var token = await _userServices.RegisterAsync(dto, ct);
         return Ok(new { token });
     }
@@ -28,7 +28,7 @@ public sealed class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var dto = new LoginDto(request.Email, request.Password);
+        var dto = new Application.DTOs.Auth.LoginRequest(request.Email, request.Password);
         var token = await _userServices.LoginAsync(dto, ct);
         return Ok(new { token });
     }

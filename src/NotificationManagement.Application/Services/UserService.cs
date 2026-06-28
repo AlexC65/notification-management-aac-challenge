@@ -17,7 +17,7 @@ namespace NotificationManagement.Application.Services
             _userRepository = userRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
-        public async Task<string> LoginAsync(LoginDto dto, CancellationToken ct = default)
+        public async Task<string> LoginAsync(LoginRequest dto, CancellationToken ct = default)
         {
             var user = await _userRepository.GetByEmailAsync(dto.Email, ct);
             if (user == null)
@@ -33,7 +33,7 @@ namespace NotificationManagement.Application.Services
             return _jwtTokenGenerator.GenerateToken(user);
         }
 
-        public async Task<string> RegisterAsync(RegisterDto dto, CancellationToken ct = default)
+        public async Task<string> RegisterAsync(RegisterRequest dto, CancellationToken ct = default)
         {
             var existingUser = await _userRepository.GetByEmailAsync(dto.Email, ct);
             if (existingUser != null)

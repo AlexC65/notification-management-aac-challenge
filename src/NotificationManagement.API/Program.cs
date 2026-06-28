@@ -7,6 +7,7 @@ using NotificationManagement.Application;
 using NotificationManagement.Infrastructure;
 using NotificationManagement.Infrastructure.Persistence;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,12 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+       .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters
+                .Add(new JsonStringEnumConverter());
+        });
 
 // ── Swagger ──────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
@@ -85,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

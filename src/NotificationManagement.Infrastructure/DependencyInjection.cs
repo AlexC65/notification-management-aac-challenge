@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NotificationManagement.Application.Interfaces;
 using NotificationManagement.Domain.Interfaces;
 using NotificationManagement.Infrastructure.Auth;
+using NotificationManagement.Infrastructure.Channels;
 using NotificationManagement.Infrastructure.Persistence;
 using NotificationManagement.Infrastructure.Repositories;
 
@@ -24,6 +25,8 @@ public static class DependencyInjection
         );
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<INotificationChannelFactory, NotificationChannelFactory>();
         //JWT
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

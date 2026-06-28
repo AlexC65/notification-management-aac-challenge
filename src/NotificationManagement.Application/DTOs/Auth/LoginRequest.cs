@@ -1,10 +1,7 @@
-
 namespace NotificationManagement.Application.DTOs.Auth;
 
-public sealed record RegisterDto(
-    string UserName,
+public sealed record LoginRequest(
     string Email,
     string Password
 );
-
 

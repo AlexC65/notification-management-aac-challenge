@@ -8,13 +8,8 @@ namespace NotificationManagement.Infrastructure.Persistence
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-        public DbSet<User> Users
-        {
-            get
-            {
-                return Set<User>();
-            }
-        }
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

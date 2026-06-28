@@ -24,6 +24,7 @@ namespace NotificationManagement.Application
             // Register application services, handlers, validators, etc.
             // e.g. services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<NotificationService>();
 
             return services;
         }
