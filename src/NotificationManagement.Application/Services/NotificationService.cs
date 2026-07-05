@@ -23,20 +23,27 @@ public sealed class NotificationService : INotificationService
         _logger = logger;
     }
 
-    public async Task<NotificationResponse> CreateAsync(
-                                    Guid userId,
-                                    string title,
-                                    string content,
-                                    ChannelType channel,
-                                    string recipient,
-                                    CancellationToken ct = default)
+    /*     public async Task<NotificationResponse> CreateAsync(
+                                        Guid userId,
+                                        string title,
+                                        string content,
+                                        ChannelType channel,
+                                        string recipient,
+                                        CancellationToken ct = default) */
+    public async Task<NotificationResponse> CreateAsync(CreateNotificationRequest createNotificationRequest,
+                                                        Guid userId,
+                                                        CancellationToken ct = default)
     {
-        var notification = Notification.Create(userId, title, content, channel, recipient);
+        var notification = Notification.Create(userId,
+                                                createNotificationRequest.Title,
+                                                createNotificationRequest.Content,
+                                                createNotificationRequest.Channel,
+                                                createNotificationRequest.Recipient);
 
         try
         {
             await _repo.AddAsync(notification, ct);
-            var sender = _channelFactory.Resolve(channel);
+            var sender = _channelFactory.Resolve(createNotificationRequest.Channel);
             await sender.SendAsync(notification, ct);
             notification.MarkAsSent();
         }
@@ -64,7 +71,7 @@ public sealed class NotificationService : INotificationService
         var list = await _repo.GetByUserIdAsync(userId, page, pageSize, ct);
 
         var result = new List<NotificationResponse>();
-        
+
         foreach (var notification in list)
             result.Add(ToResponse(notification));
 

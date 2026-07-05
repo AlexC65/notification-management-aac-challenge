@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using NotificationManagement.Application.Interfaces;
-using NotificationManagement.Application.DTOs.Auth;
-using NotificationManagement.Application.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NotificationManagement.Application.DTOs.Auth;
+using NotificationManagement.Application.DTOs.Notifications;
+using NotificationManagement.Application.Interfaces;
+using NotificationManagement.Application.Services;
 
 namespace NotificationManagement.API.Controllers;
 /// <summary>
@@ -16,24 +17,80 @@ namespace NotificationManagement.API.Controllers;
 [Produces("application/json")]
 public sealed class NotificationsController : ControllerBase
 {
-    private readonly INotificationService _notificationService;
+    //TODO: Counter: 70 Challenge 5: Implementar notificaciones en arquitectura limpia .NET 9
+    //Counter: 80
 
+    private readonly INotificationService _notificationService;
     public NotificationsController(INotificationService notificationService)
     {
         _notificationService = notificationService;
     }
 
+    // ── GET /api/notifications?page=1&pageSize=20 ───────────────────────────
+
     /// <summary>Returns a paginated list of notifications belonging to the authenticated user.</summary>
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<NotificationResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMine(
                                         [FromQuery] int page = 1,
                                         [FromQuery] int pageSize = 20,
                                         CancellationToken ct = default)
     {
         var userId = GetUserId();
-        var notifications = await _notificationService
-            .GetMyNotificationsAsync(userId, page, pageSize, ct);
+        var notifications = await _notificationService.GetMyNotificationsAsync(userId, page, pageSize, ct);
         return Ok(notifications);
+    }
+
+    // ── POST /api/notifications ───────────────────────────────────────────────
+
+    /// <summary>
+    /// Creates a notification and immediately dispatches it through the specified channel.
+    /// The response includes the resulting status (Sent / Failed) and a friendly NotificationId.
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Create(
+    [FromBody] CreateNotificationRequest request,
+    CancellationToken ct)
+    {
+        var userId = GetUserId();
+        var response = await _notificationService.CreateAsync(request, userId, ct);
+        return StatusCode(StatusCodes.Status201Created, new
+        {
+            message = "Ok",
+            sequenceNumber = response.NotificationId
+        });
+    }
+
+    // ── PUT /api/notifications/{id} ───────────────────────────────────────────
+
+    /// <summary>
+    /// Updates the title, content, and channel of an existing notification.
+    /// The notification must belong to the authenticated user.
+    /// </summary>
+    /// <param name="id">The unique identifier of the notification to update.</param>
+    /// <param name="request">The new values for title, content, and channel.</param>
+    /// <param name="ct">Token to cancel the operation.</param>
+    /// <returns>
+    /// 200 OK — returns the updated notification.
+    /// 404 Not Found — notification does not exist.
+    /// 403 Forbidden — notification belongs to a different user.
+    /// </returns>
+    
+    //TODO: Change Guid id for NotificationId check Counter:95 Challenge 5 to change other layers
+
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Update(Guid id,
+                                            [FromBody] UpdateNotificationRequest request,
+                                            CancellationToken ct)
+    {
+        var userId = GetUserId();
+        var response = await _notificationService.UpdateAsync(id, request, userId, ct);
+        return Ok(response);
     }
 
     // ── Helper ──────────────────────────────────────────────────────────────── 
@@ -41,7 +98,7 @@ public sealed class NotificationsController : ControllerBase
     {
         var claim = User.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new InvalidOperationException("User ID claim is missing from the token.");
- 
+
         return Guid.Parse(claim);
     }
 }

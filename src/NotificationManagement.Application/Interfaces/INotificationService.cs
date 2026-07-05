@@ -7,14 +7,17 @@ namespace NotificationManagement.Application.Interfaces;
 
 public interface INotificationService
 {
+        // Task<NotificationResponse> CreateAsync(
+        //                             Guid userId,
+        //                             string title,
+        //                             string content,
+        //                             ChannelType channel,
+        //                             string recipient,
+        //                             CancellationToken ct = default);
         Task<NotificationResponse> CreateAsync(
+                                    CreateNotificationRequest request,
                                     Guid userId,
-                                    string title,
-                                    string content,
-                                    ChannelType channel,
-                                    string recipient,
                                     CancellationToken ct = default);
-
         Task<NotificationResponse> UpdateAsync(
                                     Guid Id,
                                     UpdateNotificationRequest request,
