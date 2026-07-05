@@ -11,15 +11,12 @@ namespace NotificationManagement.API.Controllers;
 /// <summary>
 /// CRUD + dispatch for notifications. All endpoints require a valid JWT.
 /// </summary>
-
+[ApiController]
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]
 public sealed class NotificationsController : ControllerBase
 {
-    //TODO: Counter: 70 Challenge 5: Implementar notificaciones en arquitectura limpia .NET 9
-    //Counter: 80
-
     private readonly INotificationService _notificationService;
     public NotificationsController(INotificationService notificationService)
     {
@@ -69,7 +66,7 @@ public sealed class NotificationsController : ControllerBase
     /// Updates the title, content, and channel of an existing notification.
     /// The notification must belong to the authenticated user.
     /// </summary>
-    /// <param name="id">The unique identifier of the notification to update.</param>
+    /// <param name="notificationId">The identifier of the notification to update for this user.</param>
     /// <param name="request">The new values for title, content, and channel.</param>
     /// <param name="ct">Token to cancel the operation.</param>
     /// <returns>
@@ -77,21 +74,44 @@ public sealed class NotificationsController : ControllerBase
     /// 404 Not Found — notification does not exist.
     /// 403 Forbidden — notification belongs to a different user.
     /// </returns>
-    
-    //TODO: Change Guid id for NotificationId check Counter:95 Challenge 5 to change other layers
-
-    [HttpPut("{id:guid}")]
+    [HttpPut("{notificationId:int}")]
     [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> Update(Guid id,
+    public async Task<IActionResult> Update(int notificationId,
                                             [FromBody] UpdateNotificationRequest request,
                                             CancellationToken ct)
     {
         var userId = GetUserId();
-        var response = await _notificationService.UpdateAsync(id, request, userId, ct);
+        var response = await _notificationService.UpdateAsync(userId, notificationId, request, ct);
         return Ok(response);
     }
+
+    // ── DELETE /api/notifications/{id} ────────────────────────────────────────
+
+    /// <summary>
+    /// Deletes an existing notification belonging to the authenticated user.
+    /// The notification is identified by its sequence number.
+    /// </summary>
+    /// <param name="notificationId">The identifier of the notification to delete for this user.</param>
+    /// <param name="ct">Token to cancel the operation.</param>
+    /// <returns>
+    /// 204 No Content — notification deleted successfully.
+    /// 404 Not Found — notification does not exist.
+    /// 403 Forbidden — notification belongs to a different user.
+    /// </returns> 
+
+    [HttpDelete("{notificationId:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Delete(int notificationId, CancellationToken ct)
+    {
+        var userId = GetUserId();
+        await _notificationService.DeleteAsync(userId, notificationId, ct); ;
+        return NoContent();
+    }
+
 
     // ── Helper ──────────────────────────────────────────────────────────────── 
     private Guid GetUserId()

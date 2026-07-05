@@ -57,9 +57,9 @@ public sealed class NotificationService : INotificationService
         return ToResponse(notification);
     }
 
-    public async Task DeleteAsync(Guid id, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(Guid userId, int notificationId, CancellationToken ct = default)
     {
-        var notification = await GetAndValidateOwnershipAsync(id, userId, ct);
+        var notification = await GetAndValidateOwnershipAsync(userId, notificationId, ct);
         await _repo.DeleteAsync(notification, ct);
     }
 
@@ -78,9 +78,9 @@ public sealed class NotificationService : INotificationService
         return result;
     }
 
-    public async Task<NotificationResponse> UpdateAsync(Guid Id, UpdateNotificationRequest request, Guid userId, CancellationToken ct = default)
+    public async Task<NotificationResponse> UpdateAsync(Guid userId, int notificationId, UpdateNotificationRequest request,  CancellationToken ct = default)
     {
-        var notification = await GetAndValidateOwnershipAsync(Id, userId, ct);
+        var notification = await GetAndValidateOwnershipAsync(userId, notificationId, ct);
         notification.Update(request.Title, request.Content, request.Channel);
         await _repo.UpdateAsync(notification, ct);
         return ToResponse(notification);
@@ -103,10 +103,10 @@ public sealed class NotificationService : INotificationService
     }
 
     private async Task<Notification> GetAndValidateOwnershipAsync(
-                                        Guid id, Guid userId, CancellationToken ct)
+                                        Guid userId, int notificationId, CancellationToken ct)
     {
-        var notification = await _repo.GetByIdAsync(id, ct)
-            ?? throw new NotFoundException(nameof(Notification), id);
+        var notification = await _repo.GetBySequenceNumberAsync(userId, notificationId, ct)
+            ?? throw new NotFoundException(nameof(Notification), notificationId);
 
         if (notification.UserId != userId)
             throw new UnauthorizedAccessException();

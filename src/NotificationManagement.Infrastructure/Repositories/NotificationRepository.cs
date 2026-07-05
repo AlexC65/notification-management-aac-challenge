@@ -21,12 +21,12 @@ public class NotificationRepository : INotificationRepository
 
         try
         {
-            var nextSequence = await _db.Notifications
+            var nextNotificationId = await _db.Notifications
                 .AsNoTracking()
                 .Where(n => n.UserId == notification.UserId)
                 .CountAsync(ct) + 1;
 
-            notification.SetSequenceNumber(nextSequence);
+            notification.SetSequenceNumber(nextNotificationId);
 
             await _db.Notifications.AddAsync(notification, ct);
             await _db.SaveChangesAsync(ct);
@@ -45,13 +45,21 @@ public class NotificationRepository : INotificationRepository
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task<Notification?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Notification?> GetBySequenceNumberAsync(Guid userId, int notificationId, CancellationToken ct = default)
     {
-        object[] keyValues = new object[] { id };
-            
-        return await _db.Notifications
-                        .FindAsync(keyValues, ct);
+       return await _db.Notifications
+                    .AsNoTracking()
+                    .Where(n => n.UserId == userId && n.NotificationId == notificationId)
+                    .FirstOrDefaultAsync(ct);
     }
+
+    /*     public async Task<Notification?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            object[] keyValues = new object[] { id };
+
+            return await _db.Notifications
+                            .FindAsync(keyValues, ct);
+        } */
 
     public async Task<IEnumerable<Notification>> GetByUserIdAsync(Guid userId,
                                                                     int page = 1,
