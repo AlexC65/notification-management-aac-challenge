@@ -67,7 +67,7 @@ public class Notification
 
     public void SetSequenceNumber(int number)
     {
-        if (NotificationId != 0)
+        if (NotificationId.HasValue)
             throw new InvalidOperationException("Sequence number already set.");
         NotificationId = number;
     }

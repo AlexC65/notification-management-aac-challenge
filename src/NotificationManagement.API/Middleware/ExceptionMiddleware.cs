@@ -43,6 +43,7 @@ public sealed class ExceptionMiddleware
             //Domain exceptions
             InvalidPasswordException => (HttpStatusCode.Unauthorized, ex.Message),        // 401
             UserNotFoundException => (HttpStatusCode.NotFound, ex.Message),        // 404
+            NotFoundException => (HttpStatusCode.NotFound, ex.Message),             // 404
             InvalidEmailException     => (HttpStatusCode.BadRequest,   ex.Message),  // 400
             DomainException => (HttpStatusCode.BadRequest, ex.Message),        // 400
 

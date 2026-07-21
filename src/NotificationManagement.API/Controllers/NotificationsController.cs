@@ -11,10 +11,16 @@ namespace NotificationManagement.API.Controllers;
 /// <summary>
 /// CRUD + dispatch for notifications. All endpoints require a valid JWT.
 /// </summary>
+/// <remarks>
+/// Every action in this controller requires the caller to be authenticated
+/// (see <see cref="AuthorizeAttribute"/>). Requests without a valid bearer
+/// token will receive a 401 Unauthorized response.
+/// </remarks>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 [Produces("application/json")]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public sealed class NotificationsController : ControllerBase
 {
     private readonly INotificationService _notificationService;
@@ -25,7 +31,19 @@ public sealed class NotificationsController : ControllerBase
 
     // ── GET /api/notifications?page=1&pageSize=20 ───────────────────────────
 
-    /// <summary>Returns a paginated list of notifications belonging to the authenticated user.</summary>
+    /// <summary>
+    /// Returns a paginated list of notifications belonging to the authenticated user.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /api/notifications?page=1&amp;pageSize=20
+    ///
+    /// </remarks>
+    /// <param name="page">Page number to retrieve (1-based). Defaults to 1.</param>
+    /// <param name="pageSize">Number of items per page. Defaults to 20.</param>
+    /// <param name="ct">Token to cancel the operation.</param>
+    /// <response code="200">Returns the paginated list of notifications for the current user.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<NotificationResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMine(
@@ -42,38 +60,63 @@ public sealed class NotificationsController : ControllerBase
 
     /// <summary>
     /// Creates a notification and immediately dispatches it through the specified channel.
-    /// The response includes the resulting status (Sent / Failed) and a friendly NotificationId.
     /// </summary>
+    /// <remarks>
+    /// The notification is dispatched synchronously as part of this call. The response
+    /// includes a friendly <c>notificationId</c> that can be used to look up the
+    /// notification later (e.g. via <c>GET /api/notifications</c>).
+    ///
+    /// Sample request:
+    ///
+    ///     PUT /api/notifications/42
+    ///     {
+    ///        "title": "Updated subject",
+    ///        "content": "Updated content.",
+    ///        "channel": "Email",
+    ///        "recipient": "user@example.com"
+    ///     }
+    ///
+    /// </remarks>
+    /// <param name="request">The notification payload, including channel, recipient and content.</param>
+    /// <param name="ct">Token to cancel the operation.</param>
+    /// <response code="201">The notification was created and dispatch was attempted.</response>
+    /// <response code="400">The request payload is invalid (missing/invalid fields).</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(
-    [FromBody] CreateNotificationRequest request,
-    CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreateNotificationRequest request, CancellationToken ct)
     {
         var userId = GetUserId();
         var response = await _notificationService.CreateAsync(request, userId, ct);
         return StatusCode(StatusCodes.Status201Created, new
         {
             message = "Ok",
-            sequenceNumber = response.NotificationId
+            notificationId = response.NotificationId
         });
     }
-
     // ── PUT /api/notifications/{id} ───────────────────────────────────────────
 
     /// <summary>
     /// Updates the title, content, and channel of an existing notification.
     /// The notification must belong to the authenticated user.
     /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PUT /api/notifications/42
+    ///     {
+    ///        "channel": "Email",
+    ///        "subject": "Updated subject",
+    ///        "body": "Updated content."
+    ///     }
+    ///
+    /// </remarks>
     /// <param name="notificationId">The identifier of the notification to update for this user.</param>
     /// <param name="request">The new values for title, content, and channel.</param>
     /// <param name="ct">Token to cancel the operation.</param>
-    /// <returns>
-    /// 200 OK — returns the updated notification.
-    /// 404 Not Found — notification does not exist.
-    /// 403 Forbidden — notification belongs to a different user.
-    /// </returns>
+    /// <response code="200">Returns the updated notification.</response>
+    /// <response code="403">The notification belongs to a different user.</response>
+    /// <response code="404">The notification does not exist.</response>
     [HttpPut("{notificationId:int}")]
     [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -93,13 +136,17 @@ public sealed class NotificationsController : ControllerBase
     /// Deletes an existing notification belonging to the authenticated user.
     /// The notification is identified by its sequence number.
     /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     DELETE /api/notifications/42
+    ///
+    /// </remarks>
     /// <param name="notificationId">The identifier of the notification to delete for this user.</param>
     /// <param name="ct">Token to cancel the operation.</param>
-    /// <returns>
-    /// 204 No Content — notification deleted successfully.
-    /// 404 Not Found — notification does not exist.
-    /// 403 Forbidden — notification belongs to a different user.
-    /// </returns> 
+    /// <response code="204">The notification was deleted successfully.</response>
+    /// <response code="403">The notification belongs to a different user.</response>
+    /// <response code="404">The notification does not exist.</response> 
 
     [HttpDelete("{notificationId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -108,7 +155,7 @@ public sealed class NotificationsController : ControllerBase
     public async Task<IActionResult> Delete(int notificationId, CancellationToken ct)
     {
         var userId = GetUserId();
-        await _notificationService.DeleteAsync(userId, notificationId, ct); ;
+        await _notificationService.DeleteAsync(userId, notificationId, ct);
         return NoContent();
     }
 

@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>3cb29894-ed80-424b-bc85-f2070335607f</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NotificationManagement.Domain\NotificationManagement.Domain.csproj" />
     <ProjectReference Include="..\NotificationManagement.Infrastructure\NotificationManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\NotificationManagement.Application\NotificationManagement.Application.csproj" />
     
