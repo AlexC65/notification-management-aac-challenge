@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace NotificationManagement.IntegrationTests.Common;
 
@@ -49,6 +50,17 @@ public class ApiWebApplicationFactory : WebApplicationFactory<Program>
                 ["Jwt:Audience"] = "NotificationManagement.Tests",
                 ["Jwt:ExpirationHours"] = "1"
             });
+        });
+
+                // Avoid Windows Event Log as a logging provider during tests.
+        // On some machines the RPC service hiccups momentarily, which makes
+        // EventLogLogger throw and MASKS the real underlying exception
+        // (e.g. a DB connection error) behind a confusing logging error
+        // instead. Console-only logging is reliable and enough for tests.
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
         });
     }
 }

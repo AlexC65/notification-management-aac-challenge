@@ -45,6 +45,7 @@ public sealed class ExceptionMiddleware
             UserNotFoundException => (HttpStatusCode.NotFound, ex.Message),        // 404
             NotFoundException => (HttpStatusCode.NotFound, ex.Message),             // 404
             InvalidEmailException     => (HttpStatusCode.BadRequest,   ex.Message),  // 400
+            UserAlreadyExistsException => (HttpStatusCode.Conflict, ex.Message),  // 409
             DomainException => (HttpStatusCode.BadRequest, ex.Message),        // 400
 
             //Built-in exceptions

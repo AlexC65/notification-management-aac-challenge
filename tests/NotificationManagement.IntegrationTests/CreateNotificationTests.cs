@@ -6,7 +6,7 @@ using FluentAssertions;
 using NotificationManagement.IntegrationTests.Common;
 using Xunit;
 
-namespace NotificationManagement.IntegrationTests.Notifications;
+namespace NotificationManagement.IntegrationTests;
 
 [Collection("Database collection")]
 public class CreateNotificationTests : IAsyncLifetime

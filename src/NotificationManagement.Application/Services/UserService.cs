@@ -35,7 +35,7 @@ namespace NotificationManagement.Application.Services
 
         public async Task<string> RegisterAsync(RegisterRequest dto, CancellationToken ct = default)
         {
-            var existingUser = await _userRepository.GetByEmailAsync(dto.Email, ct);
+            var existingUser = await _userRepository.GetByEmailAsync(dto.Email.ToLowerInvariant(), ct);
             if (existingUser != null)
                 throw new UserAlreadyExistsException(dto.Email);
             
