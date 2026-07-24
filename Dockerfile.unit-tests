@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS test
+WORKDIR /src
+
+# Only what unit tests need — no Infrastructure/API required if UnitTests
+# doesn't reference them, but included here in case of shared references.
+COPY src/NotificationManagement.Domain/*.csproj src/NotificationManagement.Domain/
+COPY src/NotificationManagement.Application/*.csproj src/NotificationManagement.Application/
+COPY tests/NotificationManagement.UnitTests/*.csproj tests/NotificationManagement.UnitTests/
+
+RUN dotnet restore "tests/NotificationManagement.UnitTests/NotificationManagement.UnitTests.csproj"
+
+COPY src/NotificationManagement.Domain/ src/NotificationManagement.Domain/
+COPY src/NotificationManagement.Application/ src/NotificationManagement.Application/
+COPY tests/NotificationManagement.UnitTests/ tests/NotificationManagement.UnitTests/
+
+ENTRYPOINT ["dotnet", "test", "tests/NotificationManagement.UnitTests/NotificationManagement.UnitTests.csproj"]

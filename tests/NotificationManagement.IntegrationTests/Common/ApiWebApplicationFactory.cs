@@ -10,8 +10,14 @@ namespace NotificationManagement.IntegrationTests.Common;
 // visible via <InternalsVisibleTo> or a partial "public partial class Program".
 public class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
-    public const string TestConnectionString =
+    public const string DefaultTestConnectionString =
         "Host=localhost;Port=5433;Database=notifications_test;Username=postgres;Password=postgres";
+
+    // Resolves to the Docker-provided value when running in a container,
+    // or falls back to localhost:5433 for local runs (Visual Studio, dotnet test).
+    public static readonly string TestConnectionString =
+        Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+        ?? DefaultTestConnectionString;
 
     public ApiWebApplicationFactory()
     {
@@ -52,7 +58,7 @@ public class ApiWebApplicationFactory : WebApplicationFactory<Program>
             });
         });
 
-                // Avoid Windows Event Log as a logging provider during tests.
+        // Avoid Windows Event Log as a logging provider during tests.
         // On some machines the RPC service hiccups momentarily, which makes
         // EventLogLogger throw and MASKS the real underlying exception
         // (e.g. a DB connection error) behind a confusing logging error

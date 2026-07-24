@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS test
+WORKDIR /src
+
+COPY src/NotificationManagement.API/*.csproj src/NotificationManagement.API/
+COPY src/NotificationManagement.Application/*.csproj src/NotificationManagement.Application/
+COPY src/NotificationManagement.Domain/*.csproj src/NotificationManagement.Domain/
+COPY src/NotificationManagement.Infrastructure/*.csproj src/NotificationManagement.Infrastructure/
+COPY tests/NotificationManagement.IntegrationTests/*.csproj tests/NotificationManagement.IntegrationTests/
+
+RUN dotnet restore "tests/NotificationManagement.IntegrationTests/NotificationManagement.IntegrationTests.csproj"
+
+COPY src/ src/
+COPY tests/NotificationManagement.IntegrationTests/ tests/NotificationManagement.IntegrationTests/
+
+ENTRYPOINT ["dotnet", "test", "tests/NotificationManagement.IntegrationTests/NotificationManagement.IntegrationTests.csproj"]

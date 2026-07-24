@@ -1,4 +1,23 @@
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notifications_api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-NotificationManagement.API}
+      Jwt__Audience: ${JWT_AUDIENCE:-NotificationManagement.API}
+      Jwt__ExpirationHours: ${JWT_EXPIRATION_HOURS:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
     image: postgres:16-alpine
     container_name: postgres_dev

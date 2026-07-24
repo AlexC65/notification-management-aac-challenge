@@ -19,14 +19,20 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // EF Core + PostgreSQL
+        // EF Core + PostgreSQL ──────────────────────────────────────────────────
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
         );
-        // Repositories
+        // Repositories ──────────────────────────────────────────────────────────
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        
+        // ── Channels ──────────────────────────────────────────────────────────
+        services.AddScoped<INotificationChannel, EmailChannel>();
+        services.AddScoped<INotificationChannel, SmsChannel>();
+        services.AddScoped<INotificationChannel, PushChannel>();
         services.AddScoped<INotificationChannelFactory, NotificationChannelFactory>();
+
         //JWT
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
