@@ -2,6 +2,15 @@
 
 Full Stack Take Home Challenge – Notification management REST API with multi-channel support (Email, SMS, Push). Built with .NET C# and clean architecture.
 
+## Features
+
+- **Multi-channel notifications**: Send notifications via Email, SMS, and Push in a unified way.
+- **Strategy + Factory pattern**: Multiple notification strategies coexist and are resolved dynamically, making it easy to add new channels without breaking existing ones.
+- **Clean Architecture**: Business logic is decoupled from infrastructure and application configuration for easier testing and maintenance.
+- **JWT Authentication**: Secure endpoints using JSON Web Tokens.
+- **PostgreSQL persistence**: Reliable relational storage via Docker-hosted PostgreSQL.
+- **EF Core migrations**: Database schema managed through Entity Framework Core migrations.
+
 ## Requirements
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
@@ -48,7 +57,27 @@ dotnet ef database update \
 dotnet run --project src/NotificationManagement.API
 ```
 
+## API Endpoints
+
+### Auth
+
+| Method | Endpoint             | Description                                                       |
+|--------|-----------------------|---------------------------------------------------------------------|
+| POST   | `/api/auth/register` | Registers a new user account and returns a JWT token.               |
+| POST   | `/api/auth/login`    | Authenticates an existing user with email/password and returns a JWT token. |
+
+### Notifications
+*All endpoints below require a valid JWT (`Authorization: Bearer <token>`).*
+
+| Method | Endpoint                    | Description                                                                 |
+|--------|------------------------------|-------------------------------------------------------------------------------|
+| GET    | `/api/notifications`        | Returns a paginated list of notifications belonging to the authenticated user. Supports `page` and `pageSize` query parameters. |
+| POST   | `/api/notifications`        | Creates a notification and dispatches it immediately through the specified channel. Body: `{"title", "content", "channel", "recipient"}`. |
+| PUT    | `/api/notifications/{id}`   | Updates the title, content, channel, and recipient of an existing notification owned by the authenticated user. Body: `{"title", "content", "channel", "recipient"}`. |
+| DELETE | `/api/notifications/{id}`   | Deletes an existing notification owned by the authenticated user.            |
+
 ## Decisions Taken
 
-- I decided to implement the Strategy pattern together with a Simple Factory pattern so multiple notification strategies can coexist and be resolved correctly in `Program.cs`, avoiding the issue where registering one strategy overrides the previous one, while also making it easier to add new notification types in the future.
-- I follow Clean Architecture principles to keep the business logic decoupled from the application configuration and make the solution easier to extend and maintain.
+- **Strategy + Factory pattern**: Each notification channel (Email, SMS, Push) implements the `INotificationChannel` interface (Strategy pattern), exposing its own `ChannelType`. All implementations are registered independently in the DI container and injected as an `IEnumerable<INotificationChannel>` into `NotificationChannelFactory`, which builds a dictionary keyed by `ChannelType` and exposes a single `Resolve(ChannelType channel)` method (Simple Factory pattern). This avoids the common pitfall of registering multiple implementations under the same interface — where the DI container would only resolve the last one registered, silently overriding the previous strategies — while making it straightforward to add new channels in the future without touching existing code.
+
+- **Clean Architecture**: The solution is organized into `Domain`, `Application`, `Infrastructure`, and `API` layers, keeping business logic (notification dispatch rules, DTOs, service interfaces) decoupled from infrastructure concerns (EF Core, channel implementations) and framework/configuration details (`Program.cs`, JWT setup). This separation makes the codebase easier to test, extend, and maintain.

@@ -68,12 +68,12 @@ public sealed class NotificationsController : ControllerBase
     ///
     /// Sample request:
     ///
-    ///     PUT /api/notifications/42
+    ///     POST /api/notifications
     ///     {
-    ///        "title": "Updated subject",
-    ///        "content": "Updated content.",
-    ///        "channel": "Email",
-    ///        "recipient": "user@example.com"
+    ///        "Title": "Welcome!",
+    ///        "Content": "Thanks for signing up.",
+    ///        "Channel": "Email",
+    ///        "Recipient": "user@example.com"
     ///     }
     ///
     /// </remarks>
@@ -105,11 +105,13 @@ public sealed class NotificationsController : ControllerBase
     ///
     ///     PUT /api/notifications/42
     ///     {
-    ///        "channel": "Email",
-    ///        "subject": "Updated subject",
+    ///        
+    ///        "Title": "Updated subject",
     ///        "body": "Updated content."
+    ///        "Channel": "Email",
+    ///        "Recipient": "user@example.com"
     ///     }
-    ///
+    /// 
     /// </remarks>
     /// <param name="notificationId">The identifier of the notification to update for this user.</param>
     /// <param name="request">The new values for title, content, and channel.</param>
