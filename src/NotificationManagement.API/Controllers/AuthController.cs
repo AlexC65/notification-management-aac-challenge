@@ -79,6 +79,7 @@ public sealed class AuthController : ControllerBase
     }
 }
 
+
 /// <summary>
 /// Payload required to register a new user.
 /// </summary>

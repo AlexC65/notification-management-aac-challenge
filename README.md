@@ -11,6 +11,10 @@ Full Stack Take Home Challenge – Notification management REST API with multi-c
 - **PostgreSQL persistence**: Reliable relational storage via Docker-hosted PostgreSQL.
 - **EF Core migrations**: Database schema managed through Entity Framework Core migrations.
 
+## Badge
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/AlexC65/notification-management-aac-challenge/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/AlexC65/notification-management-aac-challenge/tree/main)
+
 ## Requirements
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
