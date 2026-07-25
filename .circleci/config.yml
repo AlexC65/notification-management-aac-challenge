@@ -12,7 +12,6 @@ jobs:
     working_directory: ~/repo
     environment:
       ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=notifications_test;Username=postgres;Password=postgres"
-      PATH: "/root/.dotnet/tools:$PATH"
     steps:
       - checkout
 
@@ -52,7 +51,9 @@ jobs:
 
       - run:
           name: Apply EF Core migrations
-          command: dotnet ef database update --project NotificationManagement.Infrastructure.csproj
+          command: |
+            export PATH="$PATH:/root/.dotnet/tools"
+            dotnet ef database update --project NotificationManagement.Infrastructure.csproj
 
       - run:
           name: Run tests
