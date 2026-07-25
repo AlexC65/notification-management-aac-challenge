@@ -29,14 +29,17 @@ jobs:
           key: dotnet-packages-{{ checksum "NotificationManagement.sln" }}
 
       - run:
+          name: Install PostgreSQL client
+          command: apt-get update && apt-get install -y postgresql-client
+
+      - run:
           name: Wait for PostgreSQL to be ready
           command: |
-            for i in $(seq 1 30); do
-              nc -z localhost 5432 && echo "PostgreSQL is up" && exit 0
+            until pg_isready -h localhost -p 5432 -U postgres; do
               echo "Waiting for PostgreSQL..."
-              sleep 2
+              sleep 1
             done
-            echo "PostgreSQL did not start in time" && exit 1
+            echo "PostgreSQL is ready!"
 
       - run:
           name: Build
