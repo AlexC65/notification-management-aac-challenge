@@ -64,6 +64,7 @@ jobs:
       - run:
           name: Run tests
           command: dotnet test NotificationManagement.sln --configuration Release --no-build
+          
 
 workflows:
   build-and-test-workflow:
