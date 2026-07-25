@@ -53,7 +53,9 @@ jobs:
           name: Apply EF Core migrations
           command: |
             export PATH="$PATH:/root/.dotnet/tools"
-            dotnet ef database update --project NotificationManagement.Infrastructure.csproj
+            dotnet ef database update \
+              --project src/NotificationManagement.Infrastructure/NotificationManagement.Infrastructure.csproj \
+              --startup-project src/NotificationManagement.API/NotificationManagement.API.csproj
 
       - run:
           name: Run tests
