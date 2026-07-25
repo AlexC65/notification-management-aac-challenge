@@ -63,10 +63,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: dotnet test NotificationManagement.sln --configuration Release --no-build --logger "trx" --results-directory ./test-results
-
-      - store_test_results:
-          path: test-results
+          command: dotnet test NotificationManagement.sln --configuration Release --no-build
 
 workflows:
   build-and-test-workflow:
