@@ -12,6 +12,10 @@ jobs:
     working_directory: ~/repo
     environment:
       ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=notifications_test;Username=postgres;Password=postgres"
+      Jwt__Secret: "test-secret-key-for-ci-only-not-for-production-use"
+      Jwt__Issuer: "NotificationManagement.API"
+      Jwt__Audience: "NotificationManagement.API"
+      Jwt__ExpirationHours: "1"
     steps:
       - checkout
 
