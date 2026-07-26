@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  coveralls: coveralls/coveralls@1.0.6
+
 jobs:
   build-and-test:
     docker:
@@ -62,9 +65,20 @@ jobs:
               --startup-project src/NotificationManagement.API/NotificationManagement.API.csproj
 
       - run:
-          name: Run tests
-          command: dotnet test NotificationManagement.sln --configuration Release --no-build
-          
+          name: Run tests with coverage
+          command: |
+            dotnet test NotificationManagement.sln --configuration Release --no-build \
+              --collect:"XPlat Code Coverage" \
+              --results-directory ./coverage \
+              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+
+      - run:
+          name: Locate and rename coverage file
+          command: |
+            find ./coverage -name "coverage.info" -exec cp {} ./coverage/lcov.info \;
+
+      - coveralls/upload:
+          path_to_lcov: ./coverage/lcov.info
 
 workflows:
   build-and-test-workflow:
