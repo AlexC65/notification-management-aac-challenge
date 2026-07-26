@@ -17,11 +17,6 @@ Full Stack Take Home Challenge – Notification management REST API with multi-c
 
 [![Coverage Status](https://coveralls.io/repos/github/AlexC65/notification-management-aac-challenge/badge.svg?branch=main)](https://coveralls.io/github/AlexC65/notification-management-aac-challenge?branch=main)
 
-## Requirements
-
-- [.NET 9 SDK](https://dotnet.microsoft.com/download)
-- [Docker](https://www.docker.com/) (for PostgreSQL)
-
 ## Setup
 
 ### 1. Clone the repository
