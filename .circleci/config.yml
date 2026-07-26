@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  coveralls: coveralls/coveralls@1.0.6
-
 jobs:
   build-and-test:
     docker:
@@ -77,8 +74,13 @@ jobs:
           command: |
             find ./coverage -name "coverage.info" -exec cp {} ./coverage/lcov.info \;
 
-      - coveralls/upload:
-          path_to_lcov: ./coverage/lcov.info
+      - run:
+          name: Upload coverage to Coveralls
+          command: |
+            curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz
+            ./coveralls report ./coverage/lcov.info \
+              --repo-token=$COVERALLS_REPO_TOKEN \
+              --format=lcov
 
 workflows:
   build-and-test-workflow:
